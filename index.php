@@ -1,5 +1,5 @@
 <?php 
-//include functions.php file
+include_once("includes/functions.php");//include functions.php file
 ?>
 <!doctype html>
 
@@ -17,7 +17,7 @@
 <body>
 
 <?php 
-//include header.php
+    include_once("includes/header.php"); //include header.php
 ?>
     <main id="main-content">
         <section id="todo-display">
@@ -35,7 +35,7 @@
         
     </main>
 <?php 
-//include footer.php
+    include_once("includes/footer.php");//include footer.php
 ?>
 </body>
 </html>

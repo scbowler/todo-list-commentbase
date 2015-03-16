@@ -47,14 +47,92 @@ body{
 
 #main-content{
     min-height: 80vh;
+    position: relative;
 }
 #todo-add{
     width: 39%;
     display: inline-block;
+    position: fixed;
+    top: 40%;
 }
 #todo-display{
     width: 60%;
     display: inline-block;
 }
 #display_refresh{
+}
+
+.fail, .success {
+    position: relative;
+    border-radius: 8px;
+    width: 235px;
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.success {
+    background-color: lightgreen;
+    border: 2px solid green;
+    color: green;
+    height: 35px;
+    font-weight: 800;
+}
+
+.fail {
+    background-color: pink;
+    border: 2px solid red;
+    color: red;
+    padding-bottom: 5px;
+}
+
+.delete {
+    cursor: pointer;
+    font-size: 19px;
+    font-weight: 800;
+    text-align: center;
+    height: 25px;
+    width: 27px;
+    background-color: rgba(255, 255, 255, .5);
+    border-radius: 8px;
+    position: absolute;
+    padding-bottom: 27px;
+    right: 8px;
+    bottom: 8px;
+    box-shadow: 1px 1px 2px black;
+}
+
+.success > .delete {
+    bottom: 3px;
+}
+
+.title, .date, .details {
+    margin: 5px;
+    width: 90%;
+}
+
+.header {
+    font-weight: 800;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.date {
+    
+}
+
+.today {
+    font-weight: 800;
+    color: green;
+    font-size: 18px;
+}
+
+.remove-msg {
+    display: inline-block;
+    position: fixed;
+    top: 40%;
+    left: 40%;
+    width: 255px;
 }
