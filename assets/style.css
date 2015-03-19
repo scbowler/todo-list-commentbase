@@ -8,6 +8,15 @@ body{
     position: relative;
     min-height: 10vh;
 }
+
+#main_header h1 {
+    padding-left: 30%;
+    text-transform: capitalize;
+    font-weight: 800;
+    color: white;
+      text-shadow: -3px -1px 1px black,-2px 5px 13px blue, 1px -1px 1px black;
+}
+
 .logo{
     float: left;
     margin: 10px;
@@ -38,7 +47,6 @@ body{
     color: green;
 }
 
-
 #main-footer{
     border-top: 1px solid black;
     min-height: 10vh;
@@ -50,22 +58,62 @@ body{
     position: relative;
 }
 #todo-add{
-    width: 39%;
+    border: 1px solid lightblue;
+    border-radius: 6px;
+    width: 30%;
     display: inline-block;
     position: fixed;
     top: 40%;
+    right: 10%;
+    box-shadow: 1px 1px 3px blue;
 }
+
+#todo-add input{
+    width: 45%;
+    margin: 6px;
+}
+
+#todo-add textarea {
+    width: 45%;
+    margin: 6px;
+}
+
+#todo-add button{
+    top: -16px;
+    font-size: 28px;
+    left: 39px;
+    width: 100px;
+    box-shadow: 2px 2px 3px gray;
+    text-shadow: 1px 1px 3px blue;
+}
+
 #todo-display{
     width: 60%;
     display: inline-block;
 }
 #display_refresh{
+    position: relative;
+    margin: 10px;
+    left: 36%;
+    font-size: 32px;
+    box-shadow: 2px 2px 3px gray;
+    text-shadow: 1px 1px 3px blue;
+}
+
+.display_container > div {
+    border: 1px solid lightblue;
+    width: 80%;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    margin-left: 10px;
+    box-shadow: 1px 1px 3px blue;
+    position: relative;
 }
 
 .fail, .success {
     position: relative;
     border-radius: 8px;
-    width: 235px;
+    min-width: 300px;
     padding-top: 5px;
     padding-left: 5px;
 }
@@ -110,11 +158,27 @@ body{
     width: 90%;
 }
 
+.delTask, .editTask {
+    position: absolute;
+    right: 3%;
+    box-shadow: 1px 1px 2px gray;
+}
+
+.delTask {
+    bottom: 15%;
+}
+
+.editTask {
+    bottom: 55%;
+    width: 91px;
+}
+
 .header {
     font-weight: 800;
 }
 
 .title {
+    text-shadow: 1px 1px 2px gray;
     font-size: 18px;
     font-weight: 600;
 }
@@ -123,9 +187,19 @@ body{
     
 }
 
+.today, .past-due {
+    text-shadow: 1px 1px 2px black;
+}
+
 .today {
     font-weight: 800;
     color: green;
+    font-size: 18px;
+}
+
+.past-due {
+    font-weight: 800;
+    color: red;
     font-size: 18px;
 }
 
@@ -135,4 +209,62 @@ body{
     top: 40%;
     left: 40%;
     width: 255px;
+}
+
+#shadow {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    
+}
+
+#editTask {
+    width: 220px;
+    position: fixed;
+    top: 25%;
+    left: 40%;
+    border: 2px solid black;
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 3px black;
+}
+
+#editTask h1 {
+    text-align: center;
+    font-weight: 800;
+    color: white;
+    margin-top: 10px;
+    text-shadow: 3px 3px black;
+}
+
+#editTask input, #editTask textarea {
+    width: 90%;
+    margin: 8px;
+}
+
+.btn-container {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.task-btn {
+    margin: 5px;
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 3px black;
+    border-radius: 6px;
+    color: white;
+}
+
+.update-succ {
+    width: 256px;
+}
+
+.update-errors {
+    width: 256px;
+    position: absolute;
+    left: 110%;
+    bottom: 40%;
 }

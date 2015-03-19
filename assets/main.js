@@ -1,42 +1,32 @@
-$('document').ready(function(){  //when the document is ready
-    $("#save_task").click(function(){  //add click handler to save_task button
+$('document').ready(function(){
+    
+    $("#save_task").click(function(){ 
 
         var todoadd = $("#todo-add");
         var form_data={
             title:todoadd.find("input[name=title]").val(),
             date:todoadd.find("input[name=date]").val(),
             details:todoadd.find("textarea[name=details]").val(),
-        }//get all the values from the form and add them to our data object for sending
+        }
         $.ajax(
         {
-            url: 'actions/add.php',//send our data to the add.php file
-            data: form_data, //give it the form data
-            dataType: 'json', //expect json data back
-            cache: false,//do not let the response be cached
-            method: 'POST', //use POST to send it
-            success: function(data){ //and do something when the response comes back
-                //success is achieved!
+            url: 'actions/add.php',
+            data: form_data,
+            dataType: 'json',
+            cache: false,
+            method: 'POST', 
+            success: function(data){ 
                 displayMSg(data, "#todo-add", "added");
+                refreshTasks();
+                
             }
         }); 
         
             
     });
-    $("#display_refresh").click(function(){  //add a click handler to our data display button
+    $("#display_refresh").click(function(){
 
-        $.ajax(
-        {
-            url: 'actions/get.php',  //get our data from the get.php file
-            dataType: 'json', //expect json data back from get.php
-            cache: false, //do not cache the result
-            method: 'POST',  //use the post method
-            success: function(data){  //do something when we get data back
-                if(data.success)
-                {
-                    $("#todo-display > .display_container").html(data.html); //take the html object of the data object, and put it into the display container
-                }
-            }
-        });
+        refreshTasks();
             
     });
     $("#todo-display").on("click", ".delTask", function(){
@@ -55,15 +45,38 @@ $('document').ready(function(){  //when the document is ready
             cache: false,
             method: 'POST',
             success: function(data){
-                $('#display_refresh').click();
+                refreshTasks();
                 displayMSg(data, "body", "removed", "remove-msg");
+                console.log(data.result);
+                
                         
             }
         });
     });
+    
+    $(".display_container").on("click", ".editTask", function(){
+        var task = {
+            id: $(this).parent().data('id')
+        }
+        
+        $.ajax({
+            url: 'includes/editForm.php',
+            data: task,
+            dataType: 'json',
+            cache: false,
+            method: 'POST',
+            success: function(data){
+                editTask(data);
+            }
+        });
+        
+    });
+    $("#display_refresh").click();
 });
 
 function displayMSg(data, append, addRemove, optClass){
+    
+    var delay = 3000;
     
     var msgDiv = $("<div></div>");
     msgDiv.on("click", ".delete", function(){
@@ -73,8 +86,9 @@ function displayMSg(data, append, addRemove, optClass){
         setTimeout(function(){errorDiv.remove();}, 600);
     });
     if(data.success){
-        msgDiv.html("Task " + addRemove + " successfuly");
+        msgDiv.html(data["success msg"]);
         msgDiv.addClass("success");
+        
     }else{
         var errorStr = "Task not " + addRemove + "<br>The following errors occured:<br>";
         msgDiv.addClass("fail");
@@ -82,6 +96,7 @@ function displayMSg(data, append, addRemove, optClass){
             errorStr += "-" + data.errors[keys] + "<br>";
         }
         msgDiv.html(errorStr);
+        delay = 10000;
     }
     if(typeof optClass !== undefined){
         msgDiv.addClass(optClass);
@@ -91,6 +106,62 @@ function displayMSg(data, append, addRemove, optClass){
     delButton.appendTo(msgDiv);
     msgDiv.appendTo(append).hide().slideDown();
 
-    //setTimeout(function(){msgDiv.slideUp(); delButton.fadeOut(200);}, 10000);
-    //setTimeout(function(){msgDiv.remove();}, 10600);
+    setTimeout(function(){msgDiv.slideUp(); delButton.fadeOut(200);}, delay);
+    setTimeout(function(){msgDiv.remove();}, delay+500);
+}
+
+function editTask(data){
+    var editView = $("<div id='shadow'><div id='editTask'><h1>Edit Task</h1>" + data['html'] + "</div></div>");
+    
+    editView.appendTo("#main-content").hide().fadeIn();
+    
+    $("#shadow").on("click", "#cancelUD", function(){
+        editView.remove();
+    });
+    
+    $("#shadow").on("click", "#update", function(){
+        
+        var form_data = {
+            title: editView.find("input[name=titleUD]").val(),
+            date: editView.find("input[name=dateUD]").val(),
+            details: editView.find("textarea[name=detailsUD]").val(),
+            id: data['id'],
+            update: true
+        }
+        
+        $.ajax({
+            url: 'actions/add.php',
+            data: form_data,
+            dataType: 'json',
+            cache: false,
+            method: 'POST',
+            success: function(data){
+                if(data.success){
+                    displayMSg(data, "#todo-add", "updated", "update-succ");
+                    editView.remove();
+                    $("#display_refresh").click();
+                }else{
+                    displayMSg(data, "#editTask", "updated", "update-errors");
+                }
+            }
+        });
+    })
+}
+
+function refreshTasks(){
+    $.ajax(
+        {
+            url: 'actions/get.php',
+            dataType: 'json', 
+            cache: false, 
+            method: 'POST',
+            success: function(data){ 
+                if(data.success)
+                {
+                    $("#todo-display > .display_container").html(data.html);
+                }else{
+                    $("#todo-display > .display_container").html("<h1>" + data['error msg'] + "<h1>");
+                }
+            }
+        });
 }

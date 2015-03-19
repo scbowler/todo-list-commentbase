@@ -1,70 +1,78 @@
 <?php
+session_start();
 date_default_timezone_set('America/Los_Angeles');
-include_once("../includes/functions.php");//require the functions.php file, make sure it is only added one time
-$errorMsgs = []; //create an array for error messages
-$output = [];    //create an array for output
-if(isset($_POST))  //check if the post variable exists
+include_once("../includes/functions.php");
+$errorMsgs = [];
+$output = [];
+if(isset($_POST))
 {
-    if($_POST['title'] === "")  //check if the title is an empty string
-    {
-        $errorMsgs['title'] = "Blank Title";//add to the error array, set the title to an appropriate error message: $error['title']='your message'
+    if(!isset($_POST['update'])){
+        $_POST['update'] = false;
     }
-    if($_POST['date'] === "") //chek if the date is an empty string
+    
+    if($_POST['title'] === "") 
     {
-        $errorMsgs['date'] = "Blank Date";//add to the error array, set the date to an appropriate error message
+        $errorMsgs['title'] = "Blank Title";
     }
-    else //if the date is not blank
+    if($_POST['date'] === "") 
     {
-        //convert the date string to a utime with strtotime
-        if(!strtotime($_POST['date'])){   //if the utime is false, the date string wasn't valid, and we display an error
-            $errorMsgs['date'] = "Invalid Date";//add to the error array, set the date to an appropirate error message
-        }
-        else if(strtotime($_POST['date']) < time()) //else if the utime is less than now (date set in past).  can find current time with time()
-        {
-            $errorMsgs['date'] = "Date is before now";//add to the error array, set the date to an appropriate error message
-        }
+        $errorMsgs['date'] = "Blank Date";
     }
-    if($_POST['details'] === "") //if the defails are blank
+    else 
     {
-            $errorMsgs['details'] = "Details blank";//add to the error array, set the date to an appropriate error message
-    }
-    if($errorMsgs === []){  //if there were no errors, ie the error array has no elements
         
-        $data = ['title'=>$_POST['title'], 'date'=>strtotime($_POST['date']), 'details'=>$_POST['details']];//make an associative array to hold the pieces of our date, the title, the date (converted to a utime), and the etails
-        $fileContents = file_get_contents("../data/todo.json");//get the contents of our todo.json file with file_get_contents.  This is so we can add to it if it exists
-        if(strlen($fileContents) === 0){  //if the length of the file's contents are 0 (ie the file was empty)
-            $fileContents = [];//make a variable to hold our list's associative array
+        if(!strtotime($_POST['date'])){ 
+            $errorMsgs['date'] = "Invalid Date: ".$_POST['date'];
         }
-        else{  //if the length is not 0, 
-           $fileContents = json_decode($fileContents, true);//json_decode the file's contents.  make sure to use "true" in the second argument so that the output is an associative array instead of standard object
-        }
-        $entryID = generateRandomString().$data['date'];//make a name for this record from: concatenate the utime with a random string, so we have unique IDs
-        
-        $fileContents[$entryID] = $data;// add a new associative array to our todo.json array, key=name generated on line above, and value is the array generated from the input data
-        $fileContents = json_encode($fileContents); //json encode the modified list array, so we can replace the original file
-        $putOK = file_put_contents("../data/todo.json", $fileContents);  //use file_put_contents to replace the contents of the todo.json with our json_encoded object
-        if($putOK > 0)  //test if the result of the file add is > 0.  If it is 0, the file add failed.
+        else if(strtotime($_POST['date']) < time())
         {
-            $output['success'] = true;//if it was greater than 0, we had a successful add.  add a success field to our output array with a boolean value of true
-            $output['success msg'] = "File updated successfuly";//add a successful message to our output array
-        }
-        else //if the result was not greater than 0, there was an error saving the file
-        {
-            $output['success'] = false; // add a success field to our output array, and set it to false
-            $output['fail msg'] = "The file failed to update";//give an appropriate message indicating failure
+            $errorMsgs['date'] = "Date is before now";
         }
     }
-    else //if error count > 0, we had an error and need to report it back to the page
+    if($_POST['details'] === "")
     {
-        $output['success'] = false; // add a success field to our output array, and set it to false
-        $output['fail msg'] = "There was an error with your input"; //give an appropriate message indicating failure
-        $output['errors'] = $errorMsgs; //add our error array to a key in our output array, so we can report exact errors and/or show appropriate errors on different inputs
+            $errorMsgs['details'] = "Details blank";
+    }
+    if($errorMsgs === []){
+        
+        $data = ['title'=>htmlentities(addslashes($_POST['title'])), 'date'=>strtotime($_POST['date']), 'details'=>htmlentities(addslashes($_POST['details']))];
+        $entryID = generateRandomString().$data['date'];
+            
+        $conn = mysqli_connect('localhost', 'root', '', 'todolist_db');
+        
+        $userID = $_SESSION['userinfo']['id'];
+        
+        if($_POST['update']){
+            $query = "UPDATE todo SET title='$data[title]', timestamp='$data[date]', details='$data[details]' WHERE id='$_POST[id]'";
+            
+        }else{
+            $query = "INSERT INTO todo (id, userID, title, timestamp, details) VALUES ('$entryID', '$userID', '$data[title]', '$data[date]', '$data[details]')";
+        }
+        
+        $result = mysqli_query($conn, $query);
+
+        if(mysqli_affected_rows($conn) == 1) 
+        {
+            $output['success'] = true;
+            $output['success msg'] = "File updated successfuly";
+        }
+        else 
+        {
+            $output['success'] = false; 
+            $output['fail msg'] .= "The file failed to update: ID = ".$_POST['id']." update ".$_POST['update'];
+        }
+    }
+    else
+    {
+        $output['success'] = false; 
+        $output['fail msg'] = "There was an error with your input";
+        $output['errors'] = $errorMsgs;
     }
 }
-else //post wasn't set, no data was available
+else
 {
-    $output['success'] = false; // add a success field to our output array, and set it to false
-    $output['fail msg'] = "No input was recieved";//give an appropriate message indicating failure
+    $output['success'] = false;
+    $output['fail msg'] = "No input was recieved";
 }
-echo json_encode($output);//json_encode our output array, and echo it
+echo json_encode($output);
 ?>

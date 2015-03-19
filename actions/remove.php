@@ -7,31 +7,15 @@
         if($_POST['toDelete'] === ""){
             $errorMsgs[] = "No entry selected for deletion";
         }else{
-            $fileContents = file_get_contents("../data/todo.json");
-            if(strlen($fileContents) === 0){
-                $errorMsgs[] = "Nothing to delete";
-            }else{
-                $fileContents = json_decode($fileContents, true);
-                foreach($fileContents as $key=>$value){
-                    if($key === $_POST['toDelete']){
-                        unset($fileContents[$key]);
-                        $fileFound = true;
-                    }
-                }
-                if(!$fileFound){
-                    $errorMsgs[] = "Entry not found";
-                }
-                $fileContents = json_encode($fileContents);
-                
-                $putOK = file_put_contents("../data/todo.json", $fileContents);
-                if($putOK < 1){
-                    $errorMsgs[] = "Error returning data to file";
-                }
-            }
+            
+            $conn = mysqli_connect('localhost', 'root', '', 'lf_db');
+            
+            $result = mysqli_query($conn, "DELETE FROM todo WHERE id='".$_POST['toDelete']."'");
         }
         if($errorMsgs === []){
             $output['success'] = true;
-            $output['error msg'] = "Task <span class='bold'>".$_POST['title']."</span> deleted successfuly";
+            $output['success msg'] = "Task $_POST[title] deleted successfuly";
+            $output['result'] = $result;
         }else{
             $output['success'] = false;
             $output['error msg'] = "There was errors removing your task";

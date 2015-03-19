@@ -1,5 +1,10 @@
 <?php 
-include_once("includes/functions.php");//include functions.php file
+session_start();
+if(!isset($_SESSION['userinfo'])){
+    header('location: todoLogin.php');
+    exit();
+}
+include_once("includes/functions.php");
 ?>
 <!doctype html>
 
@@ -17,7 +22,7 @@ include_once("includes/functions.php");//include functions.php file
 <body>
 
 <?php 
-    include_once("includes/header.php"); //include header.php
+    include_once("includes/header.php");
 ?>
     <main id="main-content">
         <section id="todo-display">
@@ -35,7 +40,7 @@ include_once("includes/functions.php");//include functions.php file
         
     </main>
 <?php 
-    include_once("includes/footer.php");//include footer.php
+    include_once("includes/footer.php");
 ?>
 </body>
 </html>
